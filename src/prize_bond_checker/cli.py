@@ -26,7 +26,7 @@ from prize_bond_checker.ai.client import get_ai_provider, provider_label
 
 from prize_bond_checker.ai.summary import generate_summary
 
-from prize_bond_checker.bonds import load_bonds
+from prize_bond_checker.bonds import load_bonds, merge_import
 
 from prize_bond_checker.checker import find_wins
 
@@ -66,7 +66,8 @@ def build_parser() -> argparse.ArgumentParser:
 
             "  prize-bond-checker --ask \"check my 200 bonds for the latest draw\"\n"
 
-            "  prize-bond-checker -d 2026-03-16 -b 200 --ai-provider ollama --summary"
+            "  prize-bond-checker --import my_bonds.csv\n"
+            "  prize-bond-checker --import bonds.xlsx --replace"
 
         ),
 
@@ -139,6 +140,30 @@ def build_parser() -> argparse.ArgumentParser:
         default="auto",
 
         help="AI provider for --summary and --ask (default: auto)",
+
+    )
+
+    parser.add_argument(
+
+        "--import",
+
+        dest="import_file",
+
+        type=Path,
+
+        metavar="FILE",
+
+        help="Import bonds from CSV, Excel (.xlsx), or text file into bonds.txt",
+
+    )
+
+    parser.add_argument(
+
+        "--replace",
+
+        action="store_true",
+
+        help="Replace bonds.txt instead of merging (use with --import)",
 
     )
 
@@ -438,11 +463,47 @@ def print_summary(
 
 
 
+def run_import(args: argparse.Namespace) -> int:
+
+    bonds_file = resolve_bonds_file(args)
+
+
+
+    try:
+
+        imported, added, total = merge_import(bonds_file, args.import_file, replace=args.replace)
+
+    except (FileNotFoundError, ValueError, ImportError) as exc:
+
+        print(f"Import error: {exc}", file=sys.stderr)
+
+        return 1
+
+
+
+    print(f"Found {imported} bond(s) in {args.import_file}")
+
+    print(f"Added {added} new bond(s) to {bonds_file}")
+
+    print(f"Total bonds saved: {total}")
+
+    return 0
+
+
+
+
+
 def main(argv: list[str] | None = None) -> int:
 
     parser = build_parser()
 
     args = parser.parse_args(argv)
+
+
+
+    if args.import_file:
+
+        return run_import(args)
 
 
 

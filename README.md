@@ -60,16 +60,31 @@ pip install -e .
 
 ### 3. Add your bonds
 
+**Option A — one by one** (`bonds.txt`):
+
 ```bash
 copy bonds.example.txt bonds.txt
 ```
 
-Edit `bonds.txt` — one bond number per line:
+Edit `bonds.txt` — one bond number per line.
 
-```text
-477670
-436083
-022667
+**Option B — bulk import (recommended for hundreds or thousands):**
+
+Export your bonds from Excel as `.csv` or `.xlsx`, then:
+
+```bash
+python check_prize_bonds.py --import my_bonds.csv
+python check_prize_bonds.py --import my_bonds.xlsx
+```
+
+Bonds can be separated by **commas, spaces, or new lines** — the tool finds every 6-digit number automatically.
+
+For Excel import: `pip install openpyxl` (or `pip install -r requirements-excel.txt`)
+
+Replace all bonds instead of merging:
+
+```bash
+python check_prize_bonds.py --import my_bonds.csv --replace
 ```
 
 > **Important:** `bonds.txt` is in `.gitignore`. Never upload your real bond numbers to GitHub.

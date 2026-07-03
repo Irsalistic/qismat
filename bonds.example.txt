@@ -1,5 +1,7 @@
 # Copy this file to bonds.txt and add your prize bond numbers.
-# One bond per line. Lines starting with # are ignored.
+# One bond per line — OR import in bulk:
+#   python check_prize_bonds.py --import my_bonds.csv
+#   python check_prize_bonds.py --import my_bonds.xlsx
 
 123456
 654321
