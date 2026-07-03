@@ -1,0 +1,2 @@
+[console_scripts]
+prize-bond-checker = prize_bond_checker.cli:main

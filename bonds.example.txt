@@ -1,0 +1,6 @@
+# Copy this file to bonds.txt and add your prize bond numbers.
+# One bond per line. Lines starting with # are ignored.
+
+123456
+654321
+000001
