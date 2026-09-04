@@ -10,6 +10,7 @@ class Win:
     bond: str
     tier: str
     amount: str
+    owner: str | None = None
 
 
 @dataclass
