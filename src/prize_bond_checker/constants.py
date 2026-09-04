@@ -29,3 +29,16 @@ PRIZE_AMOUNTS = {
 SUPPORTED_DENOMINATIONS = tuple(sorted(PRIZE_SLOTS))
 
 BASE_URL = "https://allprizebond.pk/draw/{denomination}/{draw_date}"
+HOMEPAGE_URL = "https://allprizebond.pk/"
+
+DEFAULT_DENOMINATION = 200
+DEFAULT_BONDS_FILE = "bonds.txt"
+HISTORY_FILENAME = "history.sqlite"
+LOG_FILENAME = "prize_bond_checker.log"
+WEB_PORT = 8765
+
+CLAIM_NOTE = (
+    "Verify this result through official National Savings channels before claiming. "
+    "Take the original prize bond to a National Savings centre or an authorised bank. "
+    "Claim rules and deadlines can change — confirm locally."
+)
