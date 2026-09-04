@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prize Bond Checker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <p class="kicker">National Savings · unofficial helper</p>
+      <h1>Prize Bond Checker</h1>
+      <p class="lede">Your numbers stay on this computer. Check the latest draws, keep a win ledger, and ping the family when a result is in. Say a number out loud to add it.</p>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash flash-{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    {% if last_results %}
+      <section class="panel results">
+        <h2>This check</h2>
+        <div class="result-grid">
+          {% for item in last_results %}
+            <article class="result-card {% if item.wins %}is-win{% elif item.skipped %}is-skip{% elif item.error %}is-error{% endif %}">
+              <h3>Rs. {{ item.denomination }}</h3>
+              {% if item.error %}
+                <p>{{ item.error }}</p>
+              {% elif item.skipped %}
+                <p>Already checked {{ item.draw_date }}. Nothing new to fetch.</p>
+              {% else %}
+                <p class="meta">
+                  {{ item.draw_date }}
+                  {% if item.draw and item.draw.draw_number %} · Draw #{{ item.draw.draw_number }}{% endif %}
+                  {% if item.draw and item.draw.city %} · {{ item.draw.city }}{% endif %}
+                </p>
+                <p>{{ item.bond_count }} bond{{ 's' if item.bond_count != 1 else '' }} checked.</p>
+                {% if item.wins %}
+                  <p class="win-label">You won</p>
+                  <ul>
+                    {% for win in item.wins %}
+                      <li>
+                        <strong>{{ win.bond }}</strong>
+                        · {{ win.tier }} prize · {{ win.amount }}
+                        {% if win.owner %} · {{ win.owner }}{% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                  <p class="claim">{{ claim_note }}</p>
+                {% else %}
+                  <p>No matches this time.</p>
+                {% endif %}
+                {% if item.source_url %}
+                  <p><a href="{{ item.source_url }}" target="_blank" rel="noopener">Open source draw</a></p>
+                {% endif %}
+              {% endif %}
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="stats">
+      <div class="stat">
+        <span class="stat-value">{{ stats.check_count }}</span>
+        <span class="stat-label">Draws checked</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.win_count }}</span>
+        <span class="stat-label">Wins recorded</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ bond_count }}</span>
+        <span class="stat-label">Bonds in portfolio</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">{{ stats.last_checked_at[:10] if stats.last_checked_at else '—' }}</span>
+        <span class="stat-label">Last check</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Check latest draws</h2>
+        <p>Looks up the newest published result for every denomination you hold.</p>
+      </div>
+      <form class="check-form" action="{{ url_for('run_check') }}" method="post" data-busy="Checking draws… this can take a minute.">
+        <label class="check">
+          <input type="checkbox" name="notify" value="1" {% if channels %}checked{% endif %}>
+          Send alerts if configured
+        </label>
+        <div class="actions">
+          <button type="submit" class="btn primary">Check latest</button>
+          <button type="submit" name="force" value="1" class="btn ghost">Re-check anyway</button>
+        </div>
+      </form>
+      <p class="hint">
+        Alerts:
+        {% if channels %}
+          {{ channels|join(', ') }}
+        {% else %}
+          not configured — add Telegram or WhatsApp keys to <code>.env</code>
+        {% endif %}
+      </p>
+      {% if channels %}
+        <form action="{{ url_for('notify_test') }}" method="post">
+          <button type="submit" class="btn tiny">Send test alert</button>
+        </form>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Your bonds</h2>
+        <p>Stored in <code>{{ bonds_file }}</code>. Never uploaded.</p>
+      </div>
+
+      <form class="add-form" id="add-form" action="{{ url_for('create_bond') }}" method="post">
+        <label>
+          Number
+          <input type="text" name="number" id="bond-number" inputmode="numeric" required placeholder="022667">
+        </label>
+        <label>
+          Denomination
+          <select name="denomination" id="bond-denomination">
+            {% for denom in supported %}
+              <option value="{{ denom }}" {% if denom == default_denomination %}selected{% endif %}>Rs. {{ denom }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label>
+          Owner <span class="optional">(optional)</span>
+          <input type="text" name="owner" id="bond-owner" placeholder="parents">
+        </label>
+        <button type="submit" class="btn primary">Add bond</button>
+      </form>
+
+      <form class="voice-form" id="voice-form" action="{{ url_for('create_bond_from_voice') }}" method="post">
+        <input type="hidden" name="transcript" id="voice-transcript">
+        <input type="hidden" name="denomination" id="voice-denomination" value="{{ default_denomination }}">
+        <input type="hidden" name="owner" id="voice-owner" value="">
+        <button type="button" class="btn voice" id="voice-btn" aria-pressed="false">Speak a number</button>
+        <p class="hint" id="voice-status">Click, then say the six digits. Example: “four seven seven six seven zero”.</p>
+      </form>
+      <p class="sr-only" id="speak-text">{{ speak_text }}</p>
+
+      {% if grouped %}
+        {% for denom, holdings in grouped.items() %}
+          <h3 class="denom-title">Rs. {{ denom }} · {{ holdings|length }} bond{{ 's' if holdings|length != 1 else '' }}</h3>
+          <table class="bonds">
+            <thead>
+              <tr>
+                <th>Number</th>
+                <th>Owner</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in holdings %}
+                <tr>
+                  <td><code>{{ item.number }}</code></td>
+                  <td>{{ item.owner or '—' }}</td>
+                  <td>
+                    <form action="{{ url_for('delete_bond') }}" method="post" class="inline">
+                      <input type="hidden" name="number" value="{{ item.number }}">
+                      <input type="hidden" name="denomination" value="{{ denom }}">
+                      <button type="submit" class="btn tiny danger">Remove</button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+      {% else %}
+        <p class="empty">No bonds yet. Add a number above, or copy <code>bonds.example.txt</code> to <code>bonds.txt</code>.</p>
+      {% endif %}
+    </section>
+
+    <section class="split">
+      <div class="panel">
+        <h2>Win ledger</h2>
+        {% if wins %}
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Bond</th>
+                <th>Prize</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for win in wins %}
+                <tr>
+                  <td>{{ win.draw_date }}<br><span class="quiet">Rs. {{ win.denomination }}</span></td>
+                  <td>
+                    <code>{{ win.bond }}</code>
+                    {% if win.owner %}<br><span class="quiet">{{ win.owner }}</span>{% endif %}
+                  </td>
+                  <td>{{ win.tier }}<br><span class="quiet">{{ win.amount }}</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty">No wins recorded yet. That is the honest result until one lands.</p>
+        {% endif %}
+      </div>
+
+      <div class="panel">
+        <h2>Check history</h2>
+        {% if history %}
+          <table>
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Draw</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in history %}
+                <tr>
+                  <td>{{ item.checked_at.replace('T', ' ').replace('Z', ' UTC') }}</td>
+                  <td>
+                    Rs. {{ item.denomination }} · {{ item.draw_date }}
+                    {% if item.city %}<br><span class="quiet">{{ item.city }}{% if item.draw_number %} · #{{ item.draw_number }}{% endif %}</span>{% endif %}
+                  </td>
+                  <td>{{ item.win_count }} win{{ 's' if item.win_count != 1 else '' }} / {{ item.bond_count }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="empty">History appears here after the first check.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <footer>
+      <p>Not affiliated with National Savings Pakistan or allprizebond.pk. Always verify a win through official channels before claiming.</p>
+    </footer>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
