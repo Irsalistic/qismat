@@ -1,0 +1,2 @@
+recursive-include src/prize_bond_checker/web/templates *
+recursive-include src/prize_bond_checker/web/static *
