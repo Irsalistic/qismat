@@ -5,9 +5,9 @@
 
 Automatically check your **Pakistani prize bonds** against official draw results from [allprizebond.pk](https://allprizebond.pk).
 
-Works as a normal CLI tool. **Optional AI** (Ollama, Gemini, or GPT) adds smart summaries and natural-language commands — but everything still runs fine without AI.
+Works as a normal CLI tool, a **local family dashboard**, and an optional **daily alert** (Telegram, WhatsApp, or email). **Optional AI** (Ollama, Gemini, or GPT) adds smart summaries and natural-language commands — but everything still runs fine without AI.
 
-No manual searching through thousands of numbers — just add your bonds once, run one command after each draw, and see instantly if you won.
+No manual searching through thousands of numbers — add your bonds once, run one command after each draw, and see instantly if you won.
 
 ---
 
@@ -27,17 +27,33 @@ This tool does it in seconds.
 
 - Checks **1st, 2nd, and 3rd** prize tiers (not just the table)
 - Supports all common denominations: `100`, `200`, `750`, `1500`, `7500`, `15000`, `25000`, `40000`
-- **`--latest`** — auto-check the newest published draw (no date needed)
-- **Optional AI** — Ollama (local/free), Gemini, or OpenAI for summaries and `--ask` commands
+- **Multi-denomination portfolio** — keep mixed bonds (and family owners) in one file
+- **`--latest`** / **`--all`** — auto-check the newest published draw for one or every denomination
+- **Voice add** — say the six digits on the dashboard (or `add --say`) and they are stored
+- **MCP server** — Cursor / other agents can add bonds, check draws, and read history locally
+- **Win history** — every check is stored in `history.sqlite` on your machine
+- **Alerts** — Telegram, WhatsApp (Twilio), email, or a webhook after a new draw
+- **Daily auto-check** — Windows Task Scheduler (or cron) so you do not have to remember
+- **Optional AI** — Ollama (local/free), Gemini, or OpenAI for summaries and `--ask`
 - **Works without AI** — if no provider is available, built-in summaries still work
 - Exact 6-digit bond matching (no false positives)
-- Simple bond list file — one number per line
-- Clear CLI output with optional top-prize display
 - Privacy-first: your bond numbers stay in a local file that is **never committed to git**
 
 ---
 
-## Quick start
+## Not a programmer?
+
+1. Install [Python 3.10+](https://www.python.org/downloads/) and tick **Add Python to PATH**
+2. In this folder: `pip install -r requirements.txt` then `pip install -e .`
+3. Copy `bonds.example.txt` to `bonds.txt` and add your numbers
+4. Double-click **`start-dashboard.bat`**
+5. Click **Speak a number** and read the six digits (Chrome or Edge)
+
+The dashboard opens in your browser at `http://127.0.0.1:8765`. It is only reachable on this computer.
+
+---
+
+## Quick start (CLI)
 
 ### 1. Clone or download
 
@@ -50,41 +66,24 @@ cd prize-bond-checker
 
 ```bash
 pip install -r requirements.txt
-```
-
-Or install as a package:
-
-```bash
 pip install -e .
 ```
 
 ### 3. Add your bonds
 
-**Option A — one by one** (`bonds.txt`):
-
 ```bash
 copy bonds.example.txt bonds.txt
 ```
 
-Edit `bonds.txt` — one bond number per line.
+Edit `bonds.txt` — one bond number per line, or group by denomination:
 
-**Option B — bulk import (recommended for hundreds or thousands):**
+```text
+[200]
+477670
+436083
 
-Export your bonds from Excel as `.csv` or `.xlsx`, then:
-
-```bash
-python check_prize_bonds.py --import my_bonds.csv
-python check_prize_bonds.py --import my_bonds.xlsx
-```
-
-Bonds can be separated by **commas, spaces, or new lines** — the tool finds every 6-digit number automatically.
-
-For Excel import: `pip install openpyxl` (or `pip install -r requirements-excel.txt`)
-
-Replace all bonds instead of merging:
-
-```bash
-python check_prize_bonds.py --import my_bonds.csv --replace
+[750:parents]
+123456
 ```
 
 > **Important:** `bonds.txt` is in `.gitignore`. Never upload your real bond numbers to GitHub.
@@ -95,17 +94,109 @@ python check_prize_bonds.py --import my_bonds.csv --replace
 # Manual date
 python check_prize_bonds.py -d 2026-03-16 -b 200
 
-# Auto latest draw (recommended)
+# Auto latest draw
 python check_prize_bonds.py --latest -b 200
 
-# With AI summary (optional)
+# Every denomination in your portfolio
+python check_prize_bonds.py --all --latest
+
+# With a friendly summary (optional AI)
 python check_prize_bonds.py --latest -b 200 --summary
 ```
 
 Or using the installed command:
 
 ```bash
-prize-bond-checker --latest -b 200 --summary
+prize-bond-checker --all --latest --summary
+prize-bond-checker web --open
+prize-bond-checker history
+```
+
+---
+
+## Family dashboard
+
+```bash
+python check_prize_bonds.py web --open
+```
+
+From the page you can:
+
+- Check the latest draw for every denomination you hold
+- **Speak a number** — Chrome/Edge listens, then adds the bond and reads it back
+- Add / remove bonds by typing (with an optional owner name)
+- See win ledger and check history
+- Send a test alert if Telegram or WhatsApp is configured
+
+Say: “four seven seven six seven zero” or “oh two two six six seven for parents”. Urdu digit words work too (`char`, `saat`, `sifar`).
+
+```bash
+python check_prize_bonds.py add --say "four seven seven six seven zero for parents"
+python check_prize_bonds.py add 477670 -b 200 --owner parents
+```
+
+---
+
+## MCP for Cursor and other agents
+
+The same local actions are exposed as MCP tools, so an agent can add a spoken number, check the latest draw, and read wins without uploading your bonds.
+
+```bash
+pip install -e ".[mcp]"
+```
+
+This repo already includes `.cursor/mcp.json`. After installing the extra, reload MCP in Cursor. Tools:
+
+| Tool | What it does |
+|------|----------------|
+| `add_bond` | Save one 6-digit number |
+| `add_bonds_from_speech` | Parse English/Urdu digits and save |
+| `list_bonds` | Show the local portfolio |
+| `remove_bond` | Delete a number |
+| `check_latest_draws` | Match bonds against the newest results |
+| `get_history` / `get_wins` | Read the local ledger |
+
+Resources: `prizebonds://portfolio`, `prizebonds://history`.
+
+```bash
+python -m prize_bond_checker.mcp_server
+```
+
+---
+
+## Alerts after each draw
+
+Copy `.env.example` to `.env` and fill in **one** channel.
+
+### Telegram (easiest)
+
+1. In Telegram, talk to [@BotFather](https://t.me/BotFather) and create a bot
+2. Copy the token into `TELEGRAM_BOT_TOKEN`
+3. Message your new bot, then open `https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates` and copy your `chat.id` into `TELEGRAM_CHAT_ID`
+
+```bash
+python check_prize_bonds.py notify-test
+python check_prize_bonds.py --all --latest --notify --skip-checked
+```
+
+`--skip-checked` means a daily run stays quiet unless a **new** draw is published.
+
+### WhatsApp
+
+Uses the official [Twilio WhatsApp API](https://www.twilio.com/docs/whatsapp). Set `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and `WHATSAPP_TO` in `.env`.
+
+### Daily auto-check on Windows
+
+```bash
+python check_prize_bonds.py schedule --install
+```
+
+That creates a Task Scheduler job which runs every day at 20:00, checks any new draws, and pings you if alerts are configured.
+
+Remove it with:
+
+```bash
+python check_prize_bonds.py schedule --remove
 ```
 
 ---
@@ -146,8 +237,6 @@ python check_prize_bonds.py --latest -b 200 --summary
 
 Tries **Ollama → Gemini → OpenAI** in order. If none are available, prints a built-in summary instead.
 
-Copy `.env.example` to `.env` for persistent settings (optional).
-
 ---
 
 ## Usage
@@ -155,6 +244,9 @@ Copy `.env.example` to `.env` for persistent settings (optional).
 ```bash
 # Check latest Rs. 200 draw
 python check_prize_bonds.py --latest -b 200
+
+# Check every denomination you hold
+python check_prize_bonds.py --all --latest --notify --skip-checked
 
 # Natural language (AI helps parse; basic rules work without AI too)
 python check_prize_bonds.py --ask "check my 200 bonds for the latest draw"
@@ -176,6 +268,12 @@ python check_prize_bonds.py --latest -b 200 --summary --ai-provider none
 
 # Custom bond file location
 python check_prize_bonds.py -d 2026-03-16 -b 200 -f D:\my-bonds.txt
+
+# Local dashboard
+python check_prize_bonds.py web --open
+
+# Print stored wins and past checks
+python check_prize_bonds.py history
 ```
 
 ---
@@ -218,7 +316,21 @@ Unfortunately none matched this time — better luck on the next draw!
 | `No matches found.` | Script worked; none of your bonds won |
 | `You won!` | At least one of your bonds matched |
 
-The **winning numbers themselves** change every draw. Only the **structure** (1 + 5 + 2394 for Rs. 200) stays the same.
+The **winning numbers themselves** change every draw. Always verify a win through official National Savings channels before claiming.
+
+---
+
+## Windows .exe (optional)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/build-exe.ps1
+```
+
+Put `bonds.txt` next to `dist\prize-bond-checker.exe`, then:
+
+```text
+prize-bond-checker.exe web --open
+```
 
 ---
 
@@ -230,12 +342,22 @@ prize-bond-checker/
 │   ├── cli.py          # Command-line interface
 │   ├── scraper.py      # Fetch & parse draw pages
 │   ├── latest.py       # Find latest draw date
+│   ├── service.py      # Shared check pipeline
+│   ├── portfolio.py    # Multi-denomination bond list
+│   ├── history.py      # Local win ledger
+│   ├── notify.py       # Telegram / WhatsApp / email
+│   ├── scheduler.py    # Daily Task Scheduler / cron
+│   ├── voice.py        # Spoken English/Urdu digit parser
+│   ├── actions.py      # Shared add/list helpers
+│   ├── mcp_server.py   # MCP tools for Cursor and other agents
+│   ├── web/            # Local family dashboard
 │   ├── ai/             # Optional AI providers & summaries
 │   ├── checker.py      # Match bonds against results
 │   ├── bonds.py        # Load bond list from file
 │   ├── constants.py    # Denominations & prize info
 │   └── models.py       # Data classes
 ├── tests/              # Unit tests with HTML fixtures
+├── start-dashboard.bat
 ├── bonds.example.txt   # Template for your bond list
 ├── check_prize_bonds.py
 ├── requirements.txt
@@ -249,6 +371,7 @@ prize-bond-checker/
 
 ```bash
 pip install -r requirements-dev.txt
+pip install -e .
 pytest
 ```
 

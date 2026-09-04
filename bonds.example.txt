@@ -1,8 +1,15 @@
 # Copy this file to bonds.txt and add your prize bond numbers.
-# One bond per line — OR import in bulk:
-#   python check_prize_bonds.py --import my_bonds.csv
-#   python check_prize_bonds.py --import my_bonds.xlsx
-
+# One bond per line. Lines starting with # are ignored.
+#
+# Flat list (still works). These numbers are checked with -b / default Rs. 200:
 123456
 654321
 000001
+#
+# Or group by denomination and optional owner:
+# [200]
+# 477670
+# 436083
+#
+# [750:parents]
+# 111222
