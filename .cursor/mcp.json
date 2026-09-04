@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "prize-bond-checker": {
+      "command": "python",
+      "args": ["-m", "prize_bond_checker.mcp_server"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
