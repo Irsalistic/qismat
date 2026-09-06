@@ -4,7 +4,7 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
-python -m prize_bond_checker schedule --install
+python -m qismat schedule --install
 if ($LASTEXITCODE -ne 0) {
     python check_prize_bonds.py schedule --install
 }

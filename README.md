@@ -1,9 +1,11 @@
-# 🎟️ Prize Bond Checker
+# Qismat
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Automatically check your **Pakistani prize bonds** against official draw results from [allprizebond.pk](https://allprizebond.pk).
+**Never miss a prize-bond draw.**
+
+Qismat checks your **Pakistani prize bonds** against official results from [allprizebond.pk](https://allprizebond.pk). The name is Urdu for fate — the tool just tells you, honestly, if today was your day.
 
 Works as a normal CLI tool, a **local family dashboard**, and an optional **daily alert** (Telegram, WhatsApp, or email). **Optional AI** (Ollama, Gemini, or GPT) adds smart summaries and natural-language commands — but everything still runs fine without AI.
 
@@ -58,8 +60,8 @@ The dashboard opens in your browser at `http://127.0.0.1:8765`. It is only reach
 ### 1. Clone or download
 
 ```bash
-git clone https://github.com/Irsalistic/prize-bond-checker.git
-cd prize-bond-checker
+git clone https://github.com/Irsalistic/qismat.git
+cd qismat
 ```
 
 ### 2. Install dependencies
@@ -107,9 +109,9 @@ python check_prize_bonds.py --latest -b 200 --summary
 Or using the installed command:
 
 ```bash
-prize-bond-checker --all --latest --summary
-prize-bond-checker web --open
-prize-bond-checker history
+qismat --all --latest --summary
+qismat web --open
+qismat history
 ```
 
 ---
@@ -159,7 +161,7 @@ This repo already includes `.cursor/mcp.json`. After installing the extra, reloa
 Resources: `prizebonds://portfolio`, `prizebonds://history`.
 
 ```bash
-python -m prize_bond_checker.mcp_server
+python -m qismat.mcp_server
 ```
 
 ---
@@ -326,10 +328,10 @@ The **winning numbers themselves** change every draw. Always verify a win throug
 powershell -ExecutionPolicy Bypass -File scripts/build-exe.ps1
 ```
 
-Put `bonds.txt` next to `dist\prize-bond-checker.exe`, then:
+Put `bonds.txt` next to `dist\qismat.exe`, then:
 
 ```text
-prize-bond-checker.exe web --open
+qismat.exe web --open
 ```
 
 ---
@@ -337,8 +339,8 @@ prize-bond-checker.exe web --open
 ## Project structure
 
 ```text
-prize-bond-checker/
-├── src/prize_bond_checker/
+qismat/
+├── src/qismat/
 │   ├── cli.py          # Command-line interface
 │   ├── scraper.py      # Fetch & parse draw pages
 │   ├── latest.py       # Find latest draw date

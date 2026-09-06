@@ -1,6 +1,6 @@
-from prize_bond_checker.cli import build_parser, resolve_settings
-from prize_bond_checker.notify import format_alert
-from prize_bond_checker.service import CheckOutcome
+from qismat.cli import build_parser, resolve_settings
+from qismat.notify import format_alert
+from qismat.service import CheckOutcome
 
 
 def test_parser_accepts_new_flags():

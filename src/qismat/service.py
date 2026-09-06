@@ -6,13 +6,13 @@ from dataclasses import dataclass, field
 
 import requests
 
-from prize_bond_checker.checker import find_wins
-from prize_bond_checker.constants import BASE_URL, DEFAULT_DENOMINATION
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.latest import fetch_latest_draw_date
-from prize_bond_checker.models import DrawResult, Win
-from prize_bond_checker.portfolio import Portfolio
-from prize_bond_checker.scraper import fetch_draw_html, parse_draw_html
+from qismat.checker import find_wins
+from qismat.constants import BASE_URL, DEFAULT_DENOMINATION
+from qismat.history import HistoryStore
+from qismat.latest import fetch_latest_draw_date
+from qismat.models import DrawResult, Win
+from qismat.portfolio import Portfolio
+from qismat.scraper import fetch_draw_html, parse_draw_html
 
 
 @dataclass

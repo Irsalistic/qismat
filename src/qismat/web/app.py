@@ -10,23 +10,23 @@ from pathlib import Path
 
 from flask import Flask, flash, redirect, render_template, request, url_for
 
-from prize_bond_checker.constants import (
+from qismat.constants import (
     CLAIM_NOTE,
     DEFAULT_BONDS_FILE,
     DEFAULT_DENOMINATION,
     SUPPORTED_DENOMINATIONS,
     WEB_PORT,
 )
-from prize_bond_checker.actions import add_from_speech
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.notify import configured_channels, format_alert, send_alerts
-from prize_bond_checker.portfolio import add_holding, load_portfolio, remove_holding
-from prize_bond_checker.service import check_portfolio
+from qismat.actions import add_from_speech
+from qismat.history import HistoryStore
+from qismat.notify import configured_channels, format_alert, send_alerts
+from qismat.portfolio import add_holding, load_portfolio, remove_holding
+from qismat.service import check_portfolio
 
 
 def _bundle_dir() -> Path:
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        return Path(sys._MEIPASS) / "prize_bond_checker" / "web"
+        return Path(sys._MEIPASS) / "qismat" / "web"
     return Path(__file__).resolve().parent
 
 
@@ -37,7 +37,7 @@ def create_app(bonds_file: Path, history_file: Path | None = None) -> Flask:
         template_folder=str(root / "templates"),
         static_folder=str(root / "static"),
     )
-    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "prize-bond-checker-local")
+    app.secret_key = os.environ.get("FLASK_SECRET_KEY", "qismat-local")
     app.config["BONDS_FILE"] = bonds_file
     app.config["HISTORY_FILE"] = history_file or bonds_file.with_name("history.sqlite")
 
@@ -191,7 +191,7 @@ def create_app(bonds_file: Path, history_file: Path | None = None) -> Flask:
             flash("No alert channels configured. Add Telegram or WhatsApp settings to .env first.", "error")
             return redirect(url_for("dashboard"))
         results = send_alerts(
-            "Prize Bond Checker test message.\nIf you can read this, alerts are working."
+            "Qismat test message.\nIf you can read this, alerts are working."
         )
         failed = [item for item in results if not item.ok]
         if failed:
@@ -212,7 +212,7 @@ def run_dashboard(
 ) -> None:
     app = create_app(bonds_file)
     url = f"http://{host}:{port}"
-    print(f"Prize Bond Checker dashboard: {url}")
+    print(f"Qismat dashboard: {url}")
     print("This page is only reachable on this computer.")
     print(f"Bond file: {bonds_file}")
     if open_browser:

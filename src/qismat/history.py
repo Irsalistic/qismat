@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from prize_bond_checker.models import DrawResult, Win
+from qismat.models import DrawResult, Win
 
 
 @dataclass(frozen=True)

@@ -3,21 +3,21 @@
 from pathlib import Path
 
 ROOT = Path(SPECPATH)
-SRC = ROOT / "src" / "prize_bond_checker"
+SRC = ROOT / "src" / "qismat"
 
 a = Analysis(
     ["check_prize_bonds.py"],
     pathex=[str(ROOT / "src")],
     binaries=[],
     datas=[
-        (str(SRC / "web" / "templates"), "prize_bond_checker/web/templates"),
-        (str(SRC / "web" / "static"), "prize_bond_checker/web/static"),
+        (str(SRC / "web" / "templates"), "qismat/web/templates"),
+        (str(SRC / "web" / "static"), "qismat/web/static"),
     ],
     hiddenimports=[
         "flask",
         "jinja2",
-        "prize_bond_checker.web.app",
-        "prize_bond_checker.scheduler",
+        "qismat.web.app",
+        "qismat.scheduler",
     ],
     hookspath=[],
     hooksconfig={},
@@ -34,7 +34,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="prize-bond-checker",
+    name="qismat",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

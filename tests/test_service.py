@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.portfolio import load_portfolio
-from prize_bond_checker.scraper import parse_draw_html
-from prize_bond_checker.service import check_portfolio
+from qismat.history import HistoryStore
+from qismat.portfolio import load_portfolio
+from qismat.scraper import parse_draw_html
+from qismat.service import check_portfolio
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

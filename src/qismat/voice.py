@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from prize_bond_checker.bonds import normalize_bond
-from prize_bond_checker.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
+from qismat.bonds import normalize_bond
+from qismat.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
 
 WORD_TO_DIGIT = {
     "nought": "0",

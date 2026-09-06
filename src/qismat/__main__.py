@@ -1,4 +1,4 @@
-from prize_bond_checker.cli import main
+from qismat.cli import main
 
 if __name__ == "__main__":
     raise SystemExit(main())

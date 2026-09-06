@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from prize_bond_checker.portfolio import add_holding, load_portfolio, remove_holding
+from qismat.portfolio import add_holding, load_portfolio, remove_holding
 
 
 def test_load_flat_file(tmp_path: Path):

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from prize_bond_checker.bonds import (
+from qismat.bonds import (
     extract_bonds_from_text,
     import_bonds_from_file,
     load_bonds,

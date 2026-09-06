@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "prize-bond-checker": {
+    "qismat": {
       "command": "python",
-      "args": ["-m", "prize_bond_checker.mcp_server"],
+      "args": ["-m", "qismat.mcp_server"],
       "cwd": "${workspaceFolder}"
     }
   }

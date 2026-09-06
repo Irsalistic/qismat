@@ -1,6 +1,6 @@
-from prize_bond_checker.models import DrawResult, Win
-from prize_bond_checker.notify import configured_channels, format_alert, send_alerts
-from prize_bond_checker.service import CheckOutcome
+from qismat.models import DrawResult, Win
+from qismat.notify import configured_channels, format_alert, send_alerts
+from qismat.service import CheckOutcome
 
 
 def test_configured_channels(monkeypatch):
@@ -67,7 +67,7 @@ def test_send_telegram(monkeypatch):
         captured["json"] = json
         return FakeResponse()
 
-    monkeypatch.setattr("prize_bond_checker.notify.requests.post", fake_post)
+    monkeypatch.setattr("qismat.notify.requests.post", fake_post)
     results = send_alerts("hello family")
     assert results == [type(results[0])("telegram", True, "sent")] or results[0].ok
     assert results[0].ok is True

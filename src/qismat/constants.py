@@ -34,7 +34,7 @@ HOMEPAGE_URL = "https://allprizebond.pk/"
 DEFAULT_DENOMINATION = 200
 DEFAULT_BONDS_FILE = "bonds.txt"
 HISTORY_FILENAME = "history.sqlite"
-LOG_FILENAME = "prize_bond_checker.log"
+LOG_FILENAME = "qismat.log"
 WEB_PORT = 8765
 
 CLAIM_NOTE = (

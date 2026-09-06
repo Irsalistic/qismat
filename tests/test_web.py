@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from prize_bond_checker.models import Win
-from prize_bond_checker.service import CheckOutcome
-from prize_bond_checker.web.app import create_app
+from qismat.models import Win
+from qismat.service import CheckOutcome
+from qismat.web.app import create_app
 
 
 def test_dashboard_lists_bonds(tmp_path: Path):
@@ -16,6 +16,7 @@ def test_dashboard_lists_bonds(tmp_path: Path):
     assert "022667" in body
     assert "parents" in body
     assert "Speak a number" in body
+    assert "Qismat" in body
 
 
 def test_add_bond_from_dashboard(tmp_path: Path):
@@ -45,7 +46,7 @@ def test_check_route_uses_service(monkeypatch, tmp_path: Path):
             wins=[Win(bond="022667", tier="3rd", amount="Rs. 1,250")],
         )
     ]
-    monkeypatch.setattr("prize_bond_checker.web.app.check_portfolio", lambda *a, **k: fake)
+    monkeypatch.setattr("qismat.web.app.check_portfolio", lambda *a, **k: fake)
     client = create_app(bonds).test_client()
     response = client.post("/check", data={"notify": "0"})
     assert response.status_code == 200

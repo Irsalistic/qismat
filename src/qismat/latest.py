@@ -7,7 +7,7 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from prize_bond_checker.constants import SUPPORTED_DENOMINATIONS
+from qismat.constants import SUPPORTED_DENOMINATIONS
 
 HOMEPAGE_URL = "https://allprizebond.pk/"
 DRAW_LINK_PATTERN = re.compile(r"/draw/(?P<denomination>\d+)/(?P<date>\d{4}-\d{2}-\d{2})")

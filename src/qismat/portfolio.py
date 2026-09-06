@@ -16,8 +16,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from prize_bond_checker.bonds import normalize_bond
-from prize_bond_checker.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
+from qismat.bonds import normalize_bond
+from qismat.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
 
 SECTION_RE = re.compile(r"^\[(?P<denom>\d{3,5})(?::(?P<owner>[^\]]+))?\]\s*$")
 

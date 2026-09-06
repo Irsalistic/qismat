@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from prize_bond_checker.ai.client import AIProvider
-from prize_bond_checker.models import DrawResult, Win
+from qismat.ai.client import AIProvider
+from qismat.models import DrawResult, Win
 
 
 def fallback_summary(bond_count: int, draw: DrawResult, wins: list[Win]) -> str:

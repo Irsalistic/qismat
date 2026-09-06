@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from prize_bond_checker.ai.client import AIProvider, extract_json_object
-from prize_bond_checker.constants import SUPPORTED_DENOMINATIONS
+from qismat.ai.client import AIProvider, extract_json_object
+from qismat.constants import SUPPORTED_DENOMINATIONS
 
 DATE_PATTERN = re.compile(r"\b(\d{4}-\d{2}-\d{2})\b")
 DENOM_PATTERN = re.compile(r"\b(100|200|750|1500|7500|15000|25000|40000)\b")

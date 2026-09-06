@@ -7,11 +7,11 @@ import re
 import sys
 from pathlib import Path
 
-from prize_bond_checker.ai.ask import parse_natural_language
-from prize_bond_checker.ai.client import get_ai_provider, provider_label
-from prize_bond_checker.ai.summary import generate_summary
-from prize_bond_checker.actions import add_from_speech, add_numbers
-from prize_bond_checker.constants import (
+from qismat.ai.ask import parse_natural_language
+from qismat.ai.client import get_ai_provider, provider_label
+from qismat.ai.summary import generate_summary
+from qismat.actions import add_from_speech, add_numbers
+from qismat.constants import (
     CLAIM_NOTE,
     DEFAULT_BONDS_FILE,
     DEFAULT_DENOMINATION,
@@ -20,11 +20,11 @@ from prize_bond_checker.constants import (
     SUPPORTED_DENOMINATIONS,
     WEB_PORT,
 )
-from prize_bond_checker.envfile import load_dotenv
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.notify import configured_channels, format_alert, send_alerts
-from prize_bond_checker.portfolio import load_portfolio
-from prize_bond_checker.service import CheckOutcome, check_portfolio
+from qismat.envfile import load_dotenv
+from qismat.history import HistoryStore
+from qismat.notify import configured_channels, format_alert, send_alerts
+from qismat.portfolio import load_portfolio
+from qismat.service import CheckOutcome, check_portfolio
 
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 SUBCOMMANDS = {"web", "history", "schedule", "notify-test", "add", "mcp"}
@@ -32,17 +32,17 @@ SUBCOMMANDS = {"web", "history", "schedule", "notify-test", "add", "mcp"}
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="prize-bond-checker",
+        prog="qismat",
         description="Check your Pakistani prize bonds against draw results from allprizebond.pk",
         epilog=(
             "Examples:\n"
-            "  prize-bond-checker --latest -b 200\n"
-            "  prize-bond-checker --all --latest --notify\n"
-            "  prize-bond-checker add --say \"four seven seven six seven zero\"\n"
-            "  prize-bond-checker web --open\n"
-            "  prize-bond-checker history\n"
-            "  prize-bond-checker schedule --install\n"
-            "  prize-bond-checker --ask \"check my 200 bonds for the latest draw\"\n"
+            "  qismat --latest -b 200\n"
+            "  qismat --all --latest --notify\n"
+            "  qismat add --say \"four seven seven six seven zero\"\n"
+            "  qismat web --open\n"
+            "  qismat history\n"
+            "  qismat schedule --install\n"
+            "  qismat --ask \"check my 200 bonds for the latest draw\"\n"
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -152,7 +152,7 @@ def resolve_settings(args: argparse.Namespace, portfolio_has_sections: bool) -> 
         if len(args.positional) != 2:
             raise SystemExit(
                 "Use either flags or exactly 2 positional values.\n"
-                "Example: prize-bond-checker 200 2026-03-16"
+                "Example: qismat 200 2026-03-16"
             )
         first, second = args.positional
         if first.isdigit() and len(first) <= 5:
@@ -164,7 +164,7 @@ def resolve_settings(args: argparse.Namespace, portfolio_has_sections: bool) -> 
         else:
             raise SystemExit(
                 "Could not detect denomination and date.\n"
-                "Example: prize-bond-checker 200 2026-03-16"
+                "Example: qismat 200 2026-03-16"
             )
 
     no_options = (
@@ -198,7 +198,7 @@ def resolve_settings(args: argparse.Namespace, portfolio_has_sections: bool) -> 
     if not check_all and not args.latest and draw_date is None:
         raise SystemExit(
             "Provide --date YYYY-MM-DD, use --latest, or use --all.\n"
-            "Example: prize-bond-checker --latest -b 200"
+            "Example: qismat --latest -b 200"
         )
 
     if draw_date is not None and not DATE_PATTERN.match(draw_date):
@@ -330,7 +330,7 @@ def _send_notifications(outcomes: list[CheckOutcome]) -> None:
 
 
 def run_history_cli(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="prize-bond-checker history")
+    parser = argparse.ArgumentParser(prog="qismat history")
     parser.add_argument("-f", "--bonds-file", type=Path)
     parser.add_argument("-n", "--limit", type=int, default=20)
     args = parser.parse_args(argv)
@@ -375,7 +375,7 @@ def run_history_cli(argv: list[str]) -> int:
 
 
 def run_schedule_cli(argv: list[str]) -> int:
-    from prize_bond_checker.scheduler import (
+    from qismat.scheduler import (
         cron_line,
         ensure_runner,
         install_windows_task,
@@ -383,7 +383,7 @@ def run_schedule_cli(argv: list[str]) -> int:
         task_exists,
     )
 
-    parser = argparse.ArgumentParser(prog="prize-bond-checker schedule")
+    parser = argparse.ArgumentParser(prog="qismat schedule")
     parser.add_argument("--install", action="store_true", help="Install a daily Windows scheduled task")
     parser.add_argument("--remove", action="store_true", help="Remove the daily Windows scheduled task")
     parser.add_argument("--hour", type=int, default=20, help="Hour to run (24h clock, default 20)")
@@ -432,7 +432,7 @@ def run_schedule_cli(argv: list[str]) -> int:
         print("Windows Task Scheduler runner:")
         print(f"  {ensure_runner(workdir)}")
         print()
-        print("Install it with:  prize-bond-checker schedule --install")
+        print("Install it with:  qismat schedule --install")
         print(f"Currently installed: {'yes' if task_exists() else 'no'}")
     else:
         print("Cron line:")
@@ -441,9 +441,9 @@ def run_schedule_cli(argv: list[str]) -> int:
 
 
 def run_web_cli(argv: list[str]) -> int:
-    from prize_bond_checker.web.app import run_dashboard
+    from qismat.web.app import run_dashboard
 
-    parser = argparse.ArgumentParser(prog="prize-bond-checker web")
+    parser = argparse.ArgumentParser(prog="qismat web")
     parser.add_argument("-f", "--bonds-file", type=Path)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=WEB_PORT)
@@ -459,11 +459,11 @@ def run_web_cli(argv: list[str]) -> int:
 
 
 def run_notify_test_cli(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="prize-bond-checker notify-test")
+    parser = argparse.ArgumentParser(prog="qismat notify-test")
     parser.parse_args(argv)
     channels = configured_channels()
     print("Configured channels:", ", ".join(channels) if channels else "(none)")
-    results = send_alerts("Prize Bond Checker test message.\nIf you can read this, alerts are working.")
+    results = send_alerts("Qismat test message.\nIf you can read this, alerts are working.")
     failed = False
     for item in results:
         status = "sent" if item.ok else "failed"
@@ -473,7 +473,7 @@ def run_notify_test_cli(argv: list[str]) -> int:
 
 
 def run_add_cli(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="prize-bond-checker add")
+    parser = argparse.ArgumentParser(prog="qismat add")
     parser.add_argument("number", nargs="?", help="6-digit bond number")
     parser.add_argument(
         "--say",
@@ -516,10 +516,10 @@ def run_add_cli(argv: list[str]) -> int:
 
 
 def run_mcp_cli(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(prog="prize-bond-checker mcp")
+    parser = argparse.ArgumentParser(prog="qismat mcp")
     parser.parse_args(argv)
     try:
-        from prize_bond_checker.mcp_server import main as mcp_main
+        from qismat.mcp_server import main as mcp_main
     except ImportError as exc:
         print(str(exc), file=sys.stderr)
         return 1

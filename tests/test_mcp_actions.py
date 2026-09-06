@@ -4,7 +4,7 @@ import pytest
 
 mcp = pytest.importorskip("mcp")
 
-from prize_bond_checker import mcp_server
+from qismat import mcp_server
 
 
 def test_mcp_add_bond_and_list(monkeypatch, tmp_path: Path):

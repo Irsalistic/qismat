@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from prize_bond_checker.actions import add_from_speech
-from prize_bond_checker.voice import parse_spoken_add
+from qismat.actions import add_from_speech
+from qismat.voice import parse_spoken_add
 
 
 def test_spoken_digit_words():

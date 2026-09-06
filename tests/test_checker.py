@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from prize_bond_checker.bonds import load_bonds, normalize_bond
-from prize_bond_checker.checker import find_wins
-from prize_bond_checker.scraper import parse_draw_html
+from qismat.bonds import load_bonds, normalize_bond
+from qismat.checker import find_wins
+from qismat.scraper import parse_draw_html
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-from prize_bond_checker.constants import PRIZE_AMOUNTS
-from prize_bond_checker.models import DrawResult, Win
+from qismat.constants import PRIZE_AMOUNTS
+from qismat.models import DrawResult, Win
 
 
 def find_wins(

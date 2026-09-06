@@ -7,8 +7,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-from prize_bond_checker.constants import BASE_URL
-from prize_bond_checker.models import DrawResult
+from qismat.constants import BASE_URL
+from qismat.models import DrawResult
 
 BOND_PATTERN = re.compile(r"\b\d{6}\b")
 DRAW_META_PATTERN = re.compile(

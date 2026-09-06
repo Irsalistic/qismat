@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from prize_bond_checker.constants import DEFAULT_BONDS_FILE, DEFAULT_DENOMINATION, HISTORY_FILENAME
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.portfolio import add_holding, load_portfolio, remove_holding
-from prize_bond_checker.voice import SpokenAdd, parse_spoken_add, spoken_confirmation
+from qismat.constants import DEFAULT_BONDS_FILE, DEFAULT_DENOMINATION, HISTORY_FILENAME
+from qismat.history import HistoryStore
+from qismat.portfolio import add_holding, load_portfolio, remove_holding
+from qismat.voice import SpokenAdd, parse_spoken_add, spoken_confirmation
 
 
 @dataclass

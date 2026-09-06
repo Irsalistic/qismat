@@ -11,8 +11,8 @@ from urllib.parse import urlencode
 
 import requests
 
-from prize_bond_checker.constants import CLAIM_NOTE
-from prize_bond_checker.models import Win
+from qismat.constants import CLAIM_NOTE
+from qismat.models import Win
 
 
 @dataclass(frozen=True)
@@ -43,10 +43,10 @@ def format_alert(
     """Build a plain-text alert from CheckOutcome-like objects."""
     items = list(outcomes)
     if not items:
-        return "Prize Bond Checker ran, but there was nothing to report."
+        return "Qismat ran, but there was nothing to report."
 
     wins: list[tuple[int, str, Win]] = []
-    lines = ["Prize Bond Checker"]
+    lines = ["Qismat"]
 
     for outcome in items:
         error = getattr(outcome, "error", None)
@@ -163,7 +163,7 @@ def _send_email(text: str) -> NotifyResult:
     use_tls = os.getenv("SMTP_TLS", "1") not in {"0", "false", "False"}
 
     message = EmailMessage()
-    message["Subject"] = "Prize Bond Checker"
+    message["Subject"] = "Qismat"
     message["From"] = mail_from
     message["To"] = mail_to
     message.set_content(text)

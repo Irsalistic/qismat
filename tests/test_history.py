@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.models import DrawResult, Win
+from qismat.history import HistoryStore
+from qismat.models import DrawResult, Win
 
 
 def test_history_records_checks_and_wins(tmp_path: Path):

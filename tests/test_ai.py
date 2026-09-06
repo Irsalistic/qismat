@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from prize_bond_checker.ai.ask import parse_natural_language
-from prize_bond_checker.ai.summary import fallback_summary, generate_summary
-from prize_bond_checker.latest import _extract_draw_dates, fetch_latest_draw_date
-from prize_bond_checker.scraper import parse_draw_html
+from qismat.ai.ask import parse_natural_language
+from qismat.ai.summary import fallback_summary, generate_summary
+from qismat.latest import _extract_draw_dates, fetch_latest_draw_date
+from qismat.scraper import parse_draw_html
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -59,7 +59,7 @@ def test_fetch_latest_draw_date_raises_when_missing(monkeypatch):
         def raise_for_status():
             return None
 
-    monkeypatch.setattr("prize_bond_checker.latest.requests.get", lambda *a, **k: FakeResponse())
+    monkeypatch.setattr("qismat.latest.requests.get", lambda *a, **k: FakeResponse())
 
     with pytest.raises(ValueError, match="Could not find"):
         fetch_latest_draw_date(200)

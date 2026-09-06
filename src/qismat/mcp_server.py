@@ -2,7 +2,7 @@
 
 Run with:
 
-    python -m prize_bond_checker.mcp_server
+    python -m qismat.mcp_server
 
 Cursor config lives in .cursor/mcp.json. Bond numbers stay on this machine.
 """
@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from prize_bond_checker.actions import (
+from qismat.actions import (
     add_from_speech,
     add_numbers,
     history_file_for,
@@ -22,11 +22,11 @@ from prize_bond_checker.actions import (
     remove_number,
     resolve_bonds_file,
 )
-from prize_bond_checker.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
-from prize_bond_checker.envfile import load_dotenv
-from prize_bond_checker.history import HistoryStore
-from prize_bond_checker.portfolio import load_portfolio
-from prize_bond_checker.service import check_portfolio
+from qismat.constants import DEFAULT_DENOMINATION, SUPPORTED_DENOMINATIONS
+from qismat.envfile import load_dotenv
+from qismat.history import HistoryStore
+from qismat.portfolio import load_portfolio
+from qismat.service import check_portfolio
 
 try:
     from mcp.server.mcpserver import MCPServer
@@ -36,8 +36,8 @@ except ImportError as exc:  # pragma: no cover
     ) from exc
 
 mcp = MCPServer(
-    name="prize-bond-checker",
-    title="Prize Bond Checker",
+    name="qismat",
+    title="Qismat",
     instructions=(
         "Local Pakistani prize-bond helper. Bond numbers never leave this computer. "
         "Use add_bond or add_bonds_from_speech to save numbers, list_bonds to inspect "

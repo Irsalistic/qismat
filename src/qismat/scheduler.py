@@ -6,9 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from prize_bond_checker.constants import LOG_FILENAME
+from qismat.constants import LOG_FILENAME
 
-TASK_NAME = "PrizeBondCheckerDaily"
+TASK_NAME = "QismatDaily"
 
 
 def check_args() -> str:
@@ -23,7 +23,7 @@ def ensure_runner(workdir: Path) -> Path:
     runner.write_text(
         "@echo off\r\n"
         f'cd /d "{workdir}"\r\n'
-        f'"{python}" -m prize_bond_checker {check_args()} >> "{log_path}" 2>&1\r\n',
+        f'"{python}" -m qismat {check_args()} >> "{log_path}" 2>&1\r\n',
         encoding="utf-8",
     )
     return runner
@@ -32,7 +32,7 @@ def ensure_runner(workdir: Path) -> Path:
 def cron_line(workdir: Path, hour: int = 20, minute: int = 0) -> str:
     return (
         f"{minute} {hour} * * * cd {workdir} && "
-        f"{sys.executable} -m prize_bond_checker {check_args()} "
+        f"{sys.executable} -m qismat {check_args()} "
         f">> {workdir / LOG_FILENAME} 2>&1"
     )
 

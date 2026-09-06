@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 Set-Location (Split-Path -Parent $PSScriptRoot)
 
 python -m pip install pyinstaller flask requests beautifulsoup4
-python -m PyInstaller --noconfirm prize-bond-checker.spec
+python -m PyInstaller --noconfirm qismat.spec
 
-Write-Host "Built dist\prize-bond-checker.exe"
-Write-Host "Copy bonds.txt next to the exe, then run: prize-bond-checker.exe web --open"
+Write-Host "Built dist\qismat.exe"
+Write-Host "Copy bonds.txt next to the exe, then run: qismat.exe web --open"

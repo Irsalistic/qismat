@@ -2,7 +2,7 @@
 bonds.txt
 .env
 history.sqlite
-prize_bond_checker.log
+qismat.log
 run-daily-check.bat
 
 # Python
